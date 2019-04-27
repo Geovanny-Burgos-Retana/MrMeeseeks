@@ -1,46 +1,54 @@
 #include "Menu.h"
 
-void Menu() {
+void Menu()
+{
     int option;
-    while(1) {
+    while (1)
+    {
         printf("1. Petición de restaurante\n2. Resolución de expresión\n3. Ejecución de programa\nIngrese la opción: ");
         scanf("%d", &option);
-        switch (option) {
-            case 1:
-                Petition_Option();
-                break;
-            case 2:
-                Expression_Option();
-                break;
-            case 3:                
-                Program_Option();
-                break;
-            default:
-                return;
+        switch (option)
+        {
+        case 1:
+            Petition_Option();
+            break;
+        case 2:
+            Expression_Option();
+            break;
+        case 3:
+            Program_Option();
+            break;
+        default:
+            return;
         }
     }
 }
 
-void Petition_Option() {
-
+void Petition_Option()
+{
 }
 
-
-void Expression_Option() {
+void Expression_Option()
+{
 
     /*fork and child process*/
     pid_t pid = fork();
 
-    if (pid < 0) { /*error occurred*/
+    if (pid < 0)
+    { /*error occurred*/
         fprintf(stderr, "ForkFiled");
-    } else if (pid > 0) { /* code parent process*/
+    }
+    else if (pid > 0)
+    { /* code parent process*/
         wait(NULL);
         kill(pid, SIGKILL);
-    } else if (pid == 0) { /* code child process*/
+    }
+    else if (pid == 0)
+    { /* code child process*/
         int option, result;
         char expression[50];
-        
-        printf("---------------\n1. Expresión Aritmética\n2.Expresión Lógica\nIngrese la opción: ");        
+
+        printf("---------------\n1. Expresión Aritmética\n2.Expresión Lógica\nIngrese la opción: ");
         scanf("%d", &option);
         printf("Ingrese la expresión: ");
         scanf("%s", expression);
@@ -49,20 +57,20 @@ void Expression_Option() {
 
         switch (option)
         {
-            case 1:
-                /* code for arithmetic expression */
-                result = 20;
-                sleep(10);
-                break;
-            case 2:            
-                /* code for logical expression */
-                result = 1;
-                sleep(100);
-                break;
-            default:
-                break;
+        case 1:
+            /* code for arithmetic expression */
+            result = 20;
+            sleep(10);
+            break;
+        case 2:
+            /* code for logical expression */
+            result = 1;
+            sleep(100);
+            break;
+        default:
+            break;
         }
-        
+
         /* here, do your time-consuming job and solve of expression*/
 
         clock_t end = clock();
@@ -70,47 +78,54 @@ void Expression_Option() {
     }
 }
 
-Program_Option() {
+void Program_Option()
+{
     int data_processed;
-    int pipefd[2]; // pipefd[0] is for read end of the pipe and pipe fd[1] is for write end of the pipe
-    char* some_data;
+    int file_pipes[2];
+    char some_data[BUFSIZ + 1];
     char buffer[BUFSIZ + 1];
-    pid_t pid;
+    pid_t fork_result;
 
     memset(buffer, '\0', sizeof(buffer));
 
-    if (pipe(pipefd) == 0) {
-        
-        pid = fork();
-        
-        if (pid == 0) { /* code child process */
-            printf("Child...");
-            clock_t begin = clock();            
+    if (pipe(file_pipes) == 0)
+    {
 
-            /* here, do your time-consuming job and solve of execution program */
+        fork_result = fork();
+
+        if (fork_result == -1)
+        {
+            fprintf(stderr, "Fork failure");
+            exit(EXIT_FAILURE);
+        }
+
+        if (fork_result == 0)
+        { // Child process
+
+            clock_t begin = clock();
+
+            char path[BUFSIZ +1];
+            printf ("Ingrese la dirección del programa a ejecutar: ");
+            scanf("%s", &path );
+            const char *args[]={path,NULL}; 
+            execv(args[0],args);
+            printf ("Holi");
 
             clock_t end = clock();
             double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
 
-            close(pipefd[0]); // Close reading end of pipe
-            snprintf(some_data, 50, "%f", time_spent);
-            printf("Que paso: %s", some_data);
+            snprintf(some_data, BUFSIZ + 1, "%f", time_spent);
 
-            data_processed = write(pipefd[1], some_data, strlen(some_data));
-            close(pipefd[1]);
+            data_processed = write(file_pipes[1], some_data, strlen(some_data));
+            printf("Wrote %d bytes\n", data_processed);
 
-        } else if (pid > 0) { /* code parent process*/
-            printf("Program ...");
-            wait(pid);
-            kill(pid, SIGKILL);
-            printf("Program ...");
-            close(pipefd[1]);
-
-            data_processed = (pipefd[0], buffer, BUFSIZ);
-            printf("Read %d bytes: %s\n", data_processed, buffer);
-            close(pipefd[0]);
+            exit(EXIT_SUCCESS);
         }
-    } else {
-        
+        else
+        { // Parent process            
+            data_processed = read(file_pipes[0], buffer, BUFSIZ);
+            printf("Read %d bytes: %s\n", data_processed, buffer);            
+        }
     }
+    //exit(EXIT_SUCCESS);
 }
