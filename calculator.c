@@ -1272,6 +1272,7 @@ no_command:
 						tokens[i] = NULL;
 				}
 				free(stackPop(&expr));
+				break;
 			}
 
 			for(i = 0; i < numTokens; i++)
