@@ -16,5 +16,7 @@ void Petition_Option();
 void Expression_Option();
 void Program_Option();
 bool executeFile();
+void normal_distribution();
+int find_range(float number);
 
 #endif
