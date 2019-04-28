@@ -104,12 +104,7 @@ void Program_Option()
 
             clock_t begin = clock();
 
-            char path[BUFSIZ +1];
-            printf ("Ingrese la dirección del programa a ejecutar: ");
-            scanf("%s", &path );
-            const char *args[]={path,NULL}; 
-            execv(args[0],args);
-            printf ("Holi");
+            system("./estres2");
 
             clock_t end = clock();
             double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
