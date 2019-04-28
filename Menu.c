@@ -46,19 +46,16 @@ void Expression_Option()
     else if (pid == 0)
     { /* code child process*/
         int option, result;
-        char expression[50];
 
-        printf("---------------\n1. Expresión Aritmética\n2.Expresión Lógica\nIngrese la opción: ");
+        printf("---------------\n1. Expresión Aritmética\n2. Expresión Lógica\nIngrese la opción: ");
         scanf("%d", &option);
-        printf("Ingrese la expresión: ");
-        scanf("%s", expression);
 
         clock_t begin = clock();
 
         switch (option)
         {
         case 1:
-            /* code for arithmetic expression */
+            arithmetic_expression();
             result = 20;
             sleep(10);
             break;
@@ -75,6 +72,8 @@ void Expression_Option()
 
         clock_t end = clock();
         double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+
+        exit(EXIT_SUCCESS);
     }
 }
 

@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include "calculator.h"
 
 void Menu();
 void Petition_Option();
