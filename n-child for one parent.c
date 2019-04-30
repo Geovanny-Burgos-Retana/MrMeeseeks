@@ -5,9 +5,12 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <signal.h>
+#include <semaphore.h>
+#include <pthread.h>
 
 int *count = 0;
 int *solved = 0;
+sem_t *semaphore;
 
 long Get_Prob_Success(int level, int range, int instance, int count);
 
@@ -15,9 +18,10 @@ int main() {
 
     count = mmap(NULL, sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     solved = mmap(NULL, sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    semaphore = mmap(NULL, sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    sem_init(semaphore, 1, 1);//Initialice sempahore
 
     pid_t pid_1, pid_2, pid_3;
-
     int range = 3; // Range 2 o 3
     int level = 1; // Level 2 o 3
     int id;
@@ -81,8 +85,11 @@ int main() {
             }
             
         }
-    }    
-    sleep(1000);
+    }
+    waitpid(pid_1, NULL, 0);
+    waitpid(pid_2, NULL, 0);
+    waitpid(pid_3, NULL, 0);
+    
     return 0;
     // Received the info of the child that solved the petition
 }
@@ -121,8 +128,10 @@ long random_at_most(long max) {
 }
 
 int Solve(long prob_success) {
-
+    sem_wait(semaphore);
+    printf("Hola soy el proceso. (%d, %d, %d, %d)\n", getpid(), getppid(), *count);
     if ((*solved) == 1) {
+        sem_post(semaphore);
         exit(EXIT_SUCCESS);
     } else {
         srand(getpid()); 
@@ -130,11 +139,13 @@ int Solve(long prob_success) {
         printf("Cost %d < %d\n", cost, prob_success);
         if (cost < prob_success) {
             (*solved) = 1;
+            sem_post(semaphore);
             return 1;
         } else {
+            sem_post(semaphore);
             return 0;
         }
-    }    
+    }
 }
 
 
