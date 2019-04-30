@@ -1,8 +1,14 @@
 #include "Menu.h"
 
 void Menu()
-{
+{    
+    if (pipe(file_pipes) != 0)
+        printf("Failed creating pipe!!");
+
+    memset(buffer, '\0', sizeof(buffer));
+
     int option;
+    
     while (1)
     {
         printf("1. Petición de restaurante\n2. Resolución de expresión\n3. Ejecución de programa\nIngrese la opción: ");
@@ -28,11 +34,11 @@ void Petition_Option()
 {
     char peticion[BUFSIZ +1];
     float dificultad;
-	printf ("Ingrese una petición:\n2");
+	printf ("Ingrese una petición: ");
 	scanf("%s", &peticion );
-    printf("Ingrese el grado de dificultad entre 0 y 100 o ingrese -1 para que sea calculado: ");
+    printf("Ingrese dificultad entre 0 y 100 o ingrese -1 para que sea calculado: ");
     scanf("%f", &dificultad);
-    printf("dificultada :%f\n", dificultad);
+    printf("Dificultada: %f", dificultad);
 
     if(dificultad == -1){
         normal_distribution();
@@ -99,20 +105,23 @@ int find_range(float number){
 void Expression_Option()
 {
 
-    int data_processed;
+    /*int data_processed;
     int file_pipes[2];
     char some_data[BUFSIZ + 1];
-    char buffer[BUFSIZ + 1];
+    char buffer[BUFSIZ + 1];*/
     /*fork and child process*/
     pid_t pid;
 
-    memset(buffer, '\0', sizeof(buffer));
+    //memset(buffer, '\0', sizeof(buffer));
 
     if (pipe(file_pipes) == 0)
     {
         pid = fork();
+
         if (pid == 0)
         { /* code child process*/
+            printf("Hi I'm Mr Meeseeks! Look at Meeeee. (%d, %d, %d, %d)\n", getpid(), getppid(), 1, 1);
+
             int option, result;
 
             printf("---------------\n1. Expresquiión Aritmética\n2. Expresión Lógica\nIngrese la opción: ");
@@ -156,18 +165,18 @@ void Expression_Option()
 
 void Program_Option()
 {
-    int data_processed;
+    /*int data_processed;
     int file_pipes[2];
     char some_data[BUFSIZ + 1];
-    char buffer[BUFSIZ + 1];
+    char buffer[BUFSIZ + 1];*/
     pid_t fork_result;
 
-    memset(buffer, '\0', sizeof(buffer));
+    //memset(buffer, '\0', sizeof(buffer));
 
     if (pipe(file_pipes) == 0)
     {
 
-        fork_result = fork();
+        fork_result = fork();        
 
         if (fork_result == -1)
         {
@@ -177,6 +186,8 @@ void Program_Option()
 
         if (fork_result == 0)
         { // Child process
+
+            printf("Hi I'm Mr Meeseeks! Look at Meeeee. (%d, %d, %d, %d)\n", getpid(), getppid(), 1, 1);
 
             clock_t begin = clock();
 
