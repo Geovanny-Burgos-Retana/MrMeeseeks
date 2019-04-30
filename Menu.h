@@ -10,6 +10,10 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "calculator.h"
+#include <sys/mman.h>
+#include <sys/wait.h>
+#include <semaphore.h>
+#include <pthread.h>
 
 int data_processed;
 int file_pipes[2];
@@ -21,7 +25,12 @@ void Petition_Option();
 void Expression_Option();
 void Program_Option();
 bool executeFile();
-void normal_distribution();
+int normal_distribution();
 int find_range(float number);
+void Solve_Petition(int range);
+int Solve(long prob_success);
+long random_at_most(long max);
+long Get_Prob_Success(int level, int range, int instance, int count_p);
+unsigned int rand_interval(unsigned int min, unsigned int max);
 
 #endif
