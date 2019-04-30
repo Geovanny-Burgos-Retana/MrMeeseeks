@@ -1,6 +1,6 @@
 #include "Array_Tasks.h"
 
-/* http://www.santiagoapostol.net/srca/cursoc/cursoc22.html */
+/* Recuperado de: http://www.santiagoapostol.net/srca/cursoc/cursoc22.html */
 void Add_Task(Array_Tasks *array, Task *task) {
     printf("\tDir. memoria array: %d\n", array);
     /* el campo siguiente va a ser NULL por ser el último elemento

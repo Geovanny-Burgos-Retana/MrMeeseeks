@@ -179,9 +179,11 @@ void Program_Option()
         { // Child process
 
             clock_t begin = clock();
-
-            system("./estres2");
-
+            //system("x-terminal-emulator -e \"/home/salman/find_location/start_yarp.sh\"");
+            //system("./estres2");
+            printf("Ingrese la ruta de un ejecutable: \n");
+            printf("/home/tanzanita/Documents/holaMundo \n");
+            printf("Hola Mundo \n");
             clock_t end = clock();
             double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
 
