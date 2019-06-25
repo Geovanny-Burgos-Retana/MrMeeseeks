@@ -92,45 +92,161 @@ void Solve_Petition(int range) {
     semaphore = mmap(NULL, sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     sem_init(semaphore, 1, 1);//Initialice sempahore
 
-    pid_t pid_1, pid_2, pid_3, box;
+    pid_t pid_1, pid_2, pid_3, father;
     int level = 1; // Level 2 o 3
     int id;
     float tiempo = ((float)rand()/(float)(RAND_MAX)*5.0);
     if (tiempo < 0.5)
         tiempo++;
-    
-    while(level < range) {
+    printf("Parent process: %d\n", getpid());
 
-        box = getpid();
-        pid_1 = fork();
+    father = getpid();
 
+    while (level < range) {
+
+        pid_1 = 0;
+        pid_2 = 0;
+        pid_3 = 0;
+
+        pid_1 = fork();        
 
         if (pid_1 != 0) {
             
+            pid_2 = fork();            
+
+            if (pid_2 != 0) {
+
+                pid_3 = fork();                
+
+                if (pid_3 != 0) {
+
+                    printf("Waiting sons. (%d, %d, %d, %d)  %d  %d  %d\n", getpid(), getppid(), *count, 1, pid_1, pid_2, pid_3);                    
+                        
+                    waitpid(pid_1, NULL, 0);
+                    
+                    waitpid(pid_2, NULL, 0);
+
+                    waitpid(pid_3, NULL, 0);
+                    
+                    if (father == getpid()) {
+                        printf("I'm father processs, I don't died today!!");                        
+                    } else {
+                        printf("Killed son. (%d, %d, %d, %d)\n", getpid(), getppid(), *count, 1);
+                        kill(getpid(), SIGKILL);
+                    }
+                    break;
+                } else {                    
+
+                    (*count)+= 1;
+                    id = (*count);
+
+                    printf("Hi I'm Mr Meeseeks 3! Look at Meeeee. (%d, %d, %d, %d)\n", getpid(), getppid(), *count, 3);
+
+                    sleep(2);
+
+                    level += 1;
+
+                    long prob_success = Get_Prob_Success(level, range, 3, id);
+
+                    if (Solve(prob_success)) {
+                        printf("All done!! Mr Meeseeks (%d, %d, %d, %d). Solved time: %f\n", getpid(), getppid(), *count, 2, tiempo);
+                        break;
+                    }
+                    
+                }
+            } else {
+                
+                (*count)+= 1;
+                id = (*count);
+
+                printf("Hi I'm Mr Meeseeks 2! Look at Meeeee. (%d, %d, %d, %d)\n", getpid(), getppid(), *count, 3);
+
+                sleep(2);
+                
+                level += 1;
+
+                long prob_success = Get_Prob_Success(level, range, 3, id);
+
+                if (Solve(prob_success)) {
+                    printf("All done!! Mr Meeseeks (%d, %d, %d, %d). Solved time: %f\n", getpid(), getppid(), *count, 2, tiempo);
+                    break;
+                }
+
+            }
+        } else {
+            
+            (*count)+= 1;
+            id = (*count);
+
+            printf("Hi I'm Mr Meeseeks 1! Look at Meeeee. (%d, %d, %d, %d)\n", getpid(), getppid(), *count, 3);
+
+            sleep(2);
+            
+            level += 1;
+
+            long prob_success = Get_Prob_Success(level, range, 3, id);
+
+            if (Solve(prob_success)) {
+                printf("All done!! Mr Meeseeks (%d, %d, %d, %d). Solved time: %f\n", getpid(), getppid(), *count, 2, tiempo);
+                break;
+            }
+        }
+
+        if (level == range) {
+            printf("Level and range equals. (%d, %d, %d, %d)\n", getpid(), getppid(), *count, 1);            
+            pid_1 = 0;
+            pid_2 = 0;
+            pid_3 = 0;
+        }
+        
+    }
+
+    if (pid_1 == 0 && pid_2 == 0 && pid_3 == 0) {
+        printf("Killed grandson. (%d, %d, %d, %d)\n", getpid(), getppid(), *count, 1);
+        kill(getpid(), SIGKILL);
+    }
+
+    /*father = getpid();
+
+    while(level < range) {
+
+        pid_1 = fork();
+        //sleep(1);
+
+        if (pid_1 != 0) {
+                        
             pid_2 = fork();
+            //sleep(1);
 
             if (pid_2 != 0) {
                 
-                pid_3 = fork();                
+                pid_3 = fork();
+                //sleep(1);
+                
 
-                if (pid_3 == 0) {                    
+                if (pid_3 == 0) {
+                    //pid_1 = 0;
+                    //pid_2 = 0;                    
                     (*count)+= 1;
                     id = (*count);
-                    printf("Hi I'm Mr Meeseeks! Look at Meeeee. (%d, %d, %d, %d)\n", getpid(), getppid(), *count, 3);
+                    printf("Hi I'm Mr Meeseeks 3! Look at Meeeee. (%d, %d, %d, %d)\n", getpid(), getppid(), *count, 3);
                     //printf("[son] pid %d from [parent] pid %d [count] sons, grandsons ... #%d [instance] son #%d\n", getpid(), getppid(), *count, 3);
                     level += 1;
                     // SOLVE THIRD CHILD
                     long prob_success = Get_Prob_Success(level, range, 3, id);
 
                     if (Solve(prob_success)) {
-                        printf("All done!! Mr Meeseeks (%d, %d, %d, %d). Solved time: %f\n", getpid(), getppid(), *count, 2, tiempo);                        exit(EXIT_SUCCESS);
+                        printf("All done!! Mr Meeseeks (%d, %d, %d, %d). Solved time: %f\n", getpid(), getppid(), *count, 2, tiempo);
+                        break;
                     }
                 }
             }
             if (pid_2 == 0) {
+                //pid_1 = 0;
+                //pid_3 = 0;
                 (*count)+= 1;
                 id = (*count);
-                printf("Hi I'm Mr Meeseeks! Look at Meeeee. (%d, %d, %d, %d)\n", getpid(), getppid(), *count, 2);
+                printf("Hi I'm Mr Meeseeks 2! Look at Meeeee. (%d, %d, %d, %d)\n", getpid(), getppid(), *count, 2);
                 //printf("[son] pid %d from [parent] pid %d [count] sons, grandsons ... #%d [instance] son #%d\n", getpid(), getppid(), *count, 2);
                 level += 1;
                 // SOLVE SECOND CHILD
@@ -138,18 +254,17 @@ void Solve_Petition(int range) {
                 
                 if (Solve(prob_success)) {
                     printf("All done!! Mr Meeseeks (%d, %d, %d, %d). Solved time: %f\n", getpid(), getppid(), *count, 2, tiempo);
-                    exit(EXIT_SUCCESS);
+                    break;
                 }
 
             }
-        }
-        if (pid_1 != 0 && pid_2 != 0 && pid_3 != 0) {
-            break;
-        }
+        }        
         if (pid_1 == 0) {
+            //pid_3 = 0;
+            //pid_2 = 0;
             (*count)+= 1;
             id = (*count);
-            printf("Hi I'm Mr Meeseeks! Look at Meeeee. (%d, %d, %d, %d)\n", getpid(), getppid(), *count, 1);
+            printf("Hi I'm Mr Meeseeks 1! Look at Meeeee. (%d, %d, %d, %d)\n", getpid(), getppid(), *count, 1);
             //printf("[son] pid %d from [parent] pid %d [count] sons, grandsons ... #%d [instance] son #%d\n", getpid(), getppid(), *count, 1);
             level += 1;
             // SOLVE FIRST CHILD            
@@ -158,18 +273,59 @@ void Solve_Petition(int range) {
             
             if (Solve(prob_success)) {
                 printf("All done!! Mr Meeseeks (%d, %d, %d, %d). Solved time: %f\n", getpid(), getppid(), *count, 2, tiempo);
-                exit(EXIT_SUCCESS);
+                break;
             }
             
         }
+        if (pid_1 != 0 && pid_2 != 0 && pid_3 != 0) {
+            break;
+        }
+        if (level == range) {
+            printf("Level and range equals. (%d, %d, %d, %d)\n", getpid(), getppid(), *count, 1);            
+            pid_1 = 0;
+            pid_2 = 0;
+            pid_3 = 0;
+        }
+        
     }
+
+    printf("Waiting sons. (%d, %d, %d, %d)  %d  %d  %d\n", getpid(), getppid(), *count, 1, pid_1, pid_2, pid_3);
     waitpid(pid_1, NULL, 0);
     waitpid(pid_2, NULL, 0);
     waitpid(pid_3, NULL, 0);
-    
-        kill(pid_1, SIGKILL);
+    sleep(10);
+    if (pid_1 != 0)
+        kill(pid_1, SIGKILL);        
+    if (pid_2 != 0)
+        kill(pid_2, SIGKILL);
+    if (pid_3 != 0)
+        kill(pid_3, SIGKILL);
+
+    if (pid_1 == 0 && pid_2 == 0 && pid_3 == 0) {
+        printf("Killed grandson. (%d, %d, %d, %d)\n", getpid(), getppid(), *count, 1);        
+        kill(getpid(), SIGKILL); 
+    } *//*else {
+        printf("Waiting sons. (%d, %d, %d, %d)  %d  %d  %d\n", getpid(), getppid(), *count, 1, pid_1, pid_2, pid_3);
+        waitpid(pid_1, NULL, 0);
+        waitpid(pid_2, NULL, 0);
+        waitpid(pid_3, NULL, 0);
+        sleep(10);
+        if (pid_1 != 0)
+            kill(pid_1, SIGKILL);        
+        if (pid_2 != 0)
+            kill(pid_2, SIGKILL);
+        if (pid_3 != 0)
+            kill(pid_3, SIGKILL);
+    }*/
+
+    /*
+    if (getpid() == father) {
+        printf("Waiting sons for father-----------------------. (%d, %d, %d, %d)  %d  %d  %d\n", getpid(), getppid(), *count, 1, pid_1, pid_2, pid_3);
+        
+        kill(pid_1, SIGKILL);        
         kill(pid_2, SIGKILL);
         kill(pid_3, SIGKILL);
+    }*/
     
 }
 
@@ -180,7 +336,7 @@ long Get_Prob_Success(int level, int range, int instance, int count_p) {
     } else if (level == 2 && range == 3) {
         result = 33*instance/level/3/range;
     } else {
-        result = 8*count_p;
+        result = 1*count_p;
     }
     //printf("Result = %d\n", result);
     return result;
@@ -211,7 +367,7 @@ int Solve(long prob_success) {
     //printf("Hola soy el proceso. (%d, %d, %d, %d)\n", getpid(), getppid(), *count);
     if ((*solved) == 1) {
         sem_post(semaphore);
-        exit(EXIT_SUCCESS);
+        return 0;
     } else {
         srand(getpid()); 
         long cost = random_at_most(100);
@@ -391,5 +547,5 @@ void Program_Option()
             printf("Read %d bytes: %s\n", data_processed, buffer);
         }
     }
-    //exit(EXIT_SUCCESS);
+    
 }
